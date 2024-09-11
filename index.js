@@ -4,12 +4,21 @@ const path = require('node:path');
 const { Client, Events, Collection, GatewayIntentBits } = require('discord.js');
 const logger = require('./handlers/logger');
 const { registerGuildCommands, registerGlobalCommands } = require('./handlers/registerCommand');
+const sequelize = require("./handlers/dbConnect");
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 
-client.once(Events.ClientReady, readyClient => {
-	logger.logSuccess(`Ready! Logged in as ${readyClient.user.tag}`);
+client.once(Events.ClientReady, async readyClient => {
+	logger.logInfo(`Ready! Logged in as ${readyClient.user.tag}`);
+
+    try {
+        await sequelize.authenticate();
+        logger.logSuccess("Database connection established successfully");
+    } catch (error) {
+        logger.logError('Unable to connect to the database:', error);
+    }
+    
 });
 
 client.commands = new Collection();
