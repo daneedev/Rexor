@@ -17,7 +17,7 @@ client.once(Events.ClientReady, async readyClient => {
         logger.logSuccess("Database connection established successfully");
     } catch (error) {
         logger.logError('Unable to connect to the database:', error);
-    }
+    } 
     
 });
 
@@ -26,7 +26,7 @@ client.commands = new Collection();
 const commandsFolder = path.join(__dirname, 'commands');
 const commands = fs.readdirSync(commandsFolder).filter(file => file.endsWith('.js'));
 const commandsList = [];
-
+// COMMAND HANDLER
 for (const file of commands) {
     const filePath = path.join(commandsFolder, file);
     const command = require(filePath);
@@ -36,6 +36,20 @@ for (const file of commands) {
     } else {
         logger.logWarn(`Skipping invalid command file, ${file}`);
     }
+}
+
+// EVENT HANDLER
+const eventsPath = path.join(__dirname, 'events');
+const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
+
+for (const file of eventFiles) {
+	const filePath = path.join(eventsPath, file);
+	const event = require(filePath);
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
+	}
 }
 
 client.on(Events.InteractionCreate, async interaction => {
