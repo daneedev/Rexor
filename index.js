@@ -6,7 +6,7 @@ const logger = require('./handlers/logger');
 const { registerGuildCommands, registerGlobalCommands } = require('./handlers/registerCommand');
 const sequelize = require("./handlers/dbConnect");
 
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMembers] });
 
 
 client.once(Events.ClientReady, async readyClient => {
